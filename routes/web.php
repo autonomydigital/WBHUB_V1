@@ -32,4 +32,4 @@ Route::middleware('auth')->group(function () {
 });
 
 // Catch-all fallback
-Route::get('{any}', [HomeController::class, 'index'])->where('any', '.*')->name('index');
+//Route::get('{any}', [HomeController::class, 'index'])->where('any', '.*')->name('index');

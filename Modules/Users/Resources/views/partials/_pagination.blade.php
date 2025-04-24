@@ -1,0 +1,1 @@
+{{ $users->links('vendor.pagination.bootstrap-5') }}

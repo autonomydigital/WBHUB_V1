@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Support\Str;
 
 /**
  * @method void notify(\Illuminate\Notifications\Notification $notification)
@@ -90,5 +91,92 @@ public function loginHistories()
 {
     return $this->hasMany(\App\Models\LoginHistory::class);
 }
+
+public function backupCodes()
+{
+    return $this->hasMany(BackupCode::class);
+}
+
+public function following()
+{
+    return $this->belongsToMany(User::class, 'user_follows', 'follower_id', 'followed_id')->withTimestamps();
+}
+
+public function followers()
+{
+    return $this->belongsToMany(User::class, 'user_follows', 'followed_id', 'follower_id')->withTimestamps();
+}
+
+public function isFollowing(User $user): bool
+{
+    return $this->following->contains($user->id);
+}
+
+public function sentConnections()
+{
+    return $this->hasMany(UserConnection::class, 'user_id');
+}
+
+public function receivedConnections()
+{
+    return $this->hasMany(UserConnection::class, 'connected_user_id');
+}
+
+public function connections()
+{
+    return $this->belongsToMany(User::class, 'user_connections', 'user_id', 'connected_user_id')
+        ->wherePivot('status', 'accepted')
+        ->withTimestamps();
+}
+
+public function isConnectedWith(User $user)
+{
+    return $this->allConnectionsRaw()
+        ->where('connected_user_id', $user->id)
+        ->wherePivot('status', 'accepted')
+        ->exists();
+}
+
+public function regionStatus(): string
+{
+    $localSuburbs = [
+        'Bowen', 'Airlie Beach', 'Cannonvale', 'Proserpine', 'Shute Harbour',
+        'Collinsville', 'Hydeaway Bay', 'Dingo Beach', 'Mount Julian', 'Woodwark', 'Whitsundays'
+    ];
+
+    return in_array(Str::lower($this->suburb), array_map('strtolower', $localSuburbs)) ? 'local' : 'visitor';
+}
+
+public function allConnectionsRaw()
+{
+    return $this->belongsToMany(User::class, 'user_connections', 'user_id', 'connected_user_id')
+        ->withPivot('status')
+        ->withTimestamps();
+}
+
+public function hasPendingConnectionWith($user)
+{
+    return $this->allConnectionsRaw()
+        ->where('connected_user_id', $user->id)
+        ->wherePivot('status', 'pending')
+        ->exists();
+}
+
+public function hasIncomingConnectionRequestFrom(User $user)
+{
+    return $this->receivedConnections()
+        ->where('user_id', $user->id)
+        ->where('status', 'pending')
+        ->exists();
+}
+
+public function hasSentConnectionRequestTo($user)
+{
+    return $user->receivedConnections()
+        ->where('user_id', $this->id)
+        ->where('status', 'pending')
+        ->exists();
+}
+
 
 }

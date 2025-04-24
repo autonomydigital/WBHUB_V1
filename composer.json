@@ -13,6 +13,7 @@
         "laravel/tinker": "^2.9",
         "laravel/ui": "^4.2",
         "laravolt/avatar": "^6.1",
+        "openai-php/laravel": "^0.10.1",
         "spatie/laravel-permission": "^6.16"
     },
     "require-dev": {
@@ -62,7 +63,10 @@
     "config": {
         "optimize-autoloader": true,
         "preferred-install": "dist",
-        "sort-packages": true
+        "sort-packages": true,
+        "allow-plugins": {
+            "php-http/discovery": true
+        }
     },
     "minimum-stability": "stable",
     "prefer-stable": true

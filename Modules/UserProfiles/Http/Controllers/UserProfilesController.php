@@ -1,5 +1,4 @@
 <?php
-
 namespace Modules\UserProfiles\Http\Controllers;
 
 use App\Http\Controllers\Controller;
@@ -12,24 +11,47 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
+use App\Models\BackupCode;
+
+use function Laravel\Prompts\alert;
 
 class UserProfilesController extends Controller
 {
+
     public function profile()
     {
         $user = auth()->user();
         return view('UserProfiles::profile', compact('user'));
-        }
+    }
 
     public function profileSettings()
     {
-        $user = auth()->user()->load('socials');
-        $history = LoginHistory::where('user_id', $user->id)
+        $user = request()->user(); // or use route model binding if you want
+        $user->load('socials');
+    
+        $history = \App\Models\LoginHistory::where('user_id', $user->id)
             ->orderByDesc('logged_in_at')
             ->limit(10)
             ->get();
+    
+        return view('UserProfiles::settings', compact('user', 'history'));
+    }
 
-        return view('profile-settings', compact('user','history'));
+    public function edit(\App\Models\User $user)
+    {
+        if (!auth()->user()->hasRole('superadmin')) {
+            abort(403); // 🔐 only superadmins can edit other users
+        }
+    
+        $user->load('socials');
+    
+        $history = \App\Models\LoginHistory::where('user_id', $user->id)
+            ->orderByDesc('logged_in_at')
+            ->limit(10)
+            ->get();
+    
+        return view('UserProfiles::settings', compact('user', 'history'));
     }
 
     public function updateProfile(Request $request, $id)
@@ -67,11 +89,12 @@ class UserProfilesController extends Controller
             'postcode'   => 'nullable|string|max:10',
         ]);
 
-        $user->update($request->only(['first_name', 'last_name', 'email', 'phone', 'bio', 'suburb', 'state', 'postcode']));
+        $user->update($request->only([
+            'first_name', 'last_name', 'email', 'phone',
+            'bio', 'suburb', 'state', 'postcode'
+        ]));
 
-        return $request->ajax()
-            ? response()->json(['message' => 'Profile updated successfully.'])
-            : back()->with('message', 'Profile updated successfully!');
+      //  return response()->json(['message' => 'Profile updated successfully.']);
     }
 
     public function profileCompletion()
@@ -103,9 +126,8 @@ class UserProfilesController extends Controller
             }
         }
 
-        return $request->ajax()
-            ? response()->json(['message' => 'Socials updated!'])
-            : back()->with('message', 'Socials updated!');
+       // In updateSocials controller
+return response()->json(['message' => 'Socials updated!']);
     }
 
     public function deleteSocial($platform)
@@ -123,11 +145,17 @@ class UserProfilesController extends Controller
                 if ($user->cover_photo && Storage::disk('public')->exists($user->cover_photo)) {
                     Storage::disk('public')->delete($user->cover_photo);
                 }
+
                 $coverPath = $request->file('cover_photo')->store('covers', 'public');
                 $user->cover_photo = $coverPath;
                 $user->save();
-                return response()->json(['message' => 'Cover photo updated successfully!', 'cover_url' => asset('storage/' . $coverPath)]);
+
+                return response()->json([
+                    'message' => 'Cover photo updated successfully!',
+                    'cover_url' => asset('storage/' . $coverPath)
+                ]);
             }
+
             return response()->json(['message' => 'No file provided.'], 422);
         } catch (\Exception $e) {
             Log::error('Cover photo update failed', ['error' => $e->getMessage()]);
@@ -140,7 +168,9 @@ class UserProfilesController extends Controller
         try {
             $files = File::files(public_path('default-covers'));
             $covers = collect($files)->map(fn($file) => $file->getFilename())->filter()->values();
+
             Log::info('Default covers loaded:', $covers->toArray());
+
             return response()->json(['covers' => $covers]);
         } catch (\Exception $e) {
             Log::error('Error loading default covers:', ['error' => $e->getMessage()]);
@@ -163,12 +193,16 @@ class UserProfilesController extends Controller
             if ($user->cover_photo && Storage::disk('public')->exists($user->cover_photo)) {
                 Storage::disk('public')->delete($user->cover_photo);
             }
+
             $newPath = 'covers/' . uniqid() . '_' . $filename;
             Storage::disk('public')->put($newPath, file_get_contents($fullPath));
             $user->cover_photo = $newPath;
             $user->save();
 
-            return response()->json(['message' => 'Cover updated.', 'cover_url' => asset('storage/' . $newPath)]);
+            return response()->json([
+                'message' => 'Cover updated.',
+                'cover_url' => asset('storage/' . $newPath)
+            ]);
         } catch (\Exception $e) {
             Log::error('Error saving cover: ' . $e->getMessage());
             return response()->json(['message' => 'Error saving cover.'], 500);
@@ -181,9 +215,7 @@ class UserProfilesController extends Controller
             'current_password' => ['required'],
             'new_password' => [
                 'required', 'string', 'min:8',
-                'regex:/[A-Z]/',
-                'regex:/[0-9]/',
-                'confirmed'
+                'regex:/[A-Z]/', 'regex:/[0-9]/', 'confirmed'
             ]
         ], [
             'new_password.regex' => 'New password must contain at least one uppercase letter and one number.',
@@ -220,7 +252,7 @@ class UserProfilesController extends Controller
             ->take(10)
             ->get();
 
-        return view('pages-profile-settings', compact('history'));
+        return view('UserProfiles::settings', compact('history'));
     }
 
     public function clearLoginHistory(Request $request)
@@ -245,4 +277,58 @@ class UserProfilesController extends Controller
 
         return response()->json(['message' => 'Security setting updated.']);
     }
+    
+    public function generateBackupCode(Request $request)
+    {
+        $user = auth()->user();
+    
+        // Optional: delete old codes if you only want one
+        BackupCode::where('user_id', $user->id)->delete();
+    
+        $code = strtoupper(Str::random(8)); // Change 8 to however many characters you want
+    
+        BackupCode::create([
+            'user_id' => $user->id,
+            'code' => $code,
+            'used_at' => false
+        ]);
+    
+        return response()->json([
+            'success' => true,
+            'code' => $code
+        ]);
+    }
+
+    public function toggleNotification(Request $request)
+    {
+        $user = auth()->user();
+    
+        // Validate input
+        $request->validate([
+            'id' => 'required|string',
+            'enabled' => 'required|boolean',
+        ]);
+    
+        $notif = $request->input('id');
+        $enabled = $request->boolean('enabled');
+    
+        // Load existing settings
+        $settings = json_decode($user->notification_settings, true) ?? [];
+    
+        // Update this setting
+        $settings[$notif] = $enabled;
+    
+        // Save it back to the user
+        $user->notification_settings = json_encode($settings);
+        $user->save();
+    
+        return response()->json(['success' => true]);
+    }
+
+    public function show(\App\Models\User $user)
+{
+    return view('UserProfiles::profile', compact('user'));
 }
+
+}
+

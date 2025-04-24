@@ -26,6 +26,8 @@
             <div class="page-content">
                 <div class="container-fluid">
                     <?php echo $__env->yieldContent('content'); ?>
+
+                    <?php echo $__env->yieldPushContent('module-scripts'); ?>
                 </div>
                 <!-- container-fluid -->
             </div>

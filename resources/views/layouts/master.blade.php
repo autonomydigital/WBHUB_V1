@@ -26,6 +26,8 @@
             <div class="page-content">
                 <div class="container-fluid">
                     @yield('content')
+
+                    @stack('module-scripts')
                 </div>
                 <!-- container-fluid -->
             </div>
