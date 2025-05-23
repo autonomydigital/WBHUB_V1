@@ -1,0 +1,1 @@
+{{ $businesses->links('vendor.pagination.bootstrap-5') }}

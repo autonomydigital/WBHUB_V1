@@ -120,6 +120,14 @@
 
             <div class="d-flex align-items-center">
 
+                
+
+                <div class="ms-1 header-item d-none d-sm-flex">
+                    <button type="button" class="btn btn-icon btn-topbar btn-ghost-secondary rounded-circle" id="confettiTriggerBtn" title="Celebrate!">
+                        <i class="ri-sparkling-2-line fs-22"></i>
+                    </button>
+                </div>
+
                 <div class="dropdown d-md-none topbar-head-dropdown header-item">
                     <button type="button" class="btn btn-icon btn-topbar btn-ghost-secondary rounded-circle" id="page-header-search-dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <i class="bx bx-search fs-22"></i>
@@ -140,9 +148,18 @@
 
                 <?php $__env->startPush('module-scripts'); ?>
                 <script src="<?php echo e(asset('js/modules/users/settings.js')); ?>"></script>
+                <script src="<?php echo e(asset('js/modules/notifications/settings.js')); ?>"></script>
+                <script>
+                    window.connectionsAcceptUrl = "<?php echo e(url('connections/accept')); ?>";
+                    window.connectionsDenyUrl = "<?php echo e(url('connections/deny')); ?>";
+                </script>
+
             <?php $__env->stopPush(); ?>
 
+            
+
                 <div class="dropdown topbar-head-dropdown ms-1 header-item">
+
                     <button type="button" class="btn btn-icon btn-topbar btn-ghost-secondary rounded-circle" id="page-header-cart-dropdown" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-haspopup="true" aria-expanded="false">
                         <i class='bx bx-shopping-bag fs-22'></i>
                         <span class="position-absolute topbar-badge cartitem-badge fs-10 translate-middle badge rounded-pill bg-info">5</span>
@@ -363,4 +380,406 @@
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
-<?php /**PATH /Users/luk/Desktop/WORKSPACE/WBHUB_V1/resources/views/layouts/topbar.blade.php ENDPATH**/ ?>
+
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+<script>
+    function fireRandomConfetti() {
+        const effects = [
+    // 💥 1. Wide top burst (downward)
+    () => confetti({
+        particleCount: 250,
+        spread: 160,
+        startVelocity: 35,
+        angle: 90,
+        origin: { y: 0.8 }
+    }),
+
+    // 💨 2. Left corner blast (wider, stronger)
+    () => confetti({
+        particleCount: 200,
+        angle: 70,
+        spread: 100,
+        startVelocity: 45,
+        origin: { x: 0, y: 0.7 }
+    }),
+
+    // 💨 3. Right corner blast (wider, stronger)
+    () => confetti({
+        particleCount: 200,
+        angle: 110,
+        spread: 100,
+        startVelocity: 45,
+        origin: { x: 1, y: 0.7 }
+    }),
+
+    // 🌪 4. Full screen chaos (big, random)
+    () => confetti({
+        particleCount: 400,
+        spread: 360,
+        startVelocity: 50,
+        ticks: 90,
+        origin: { x: Math.random(), y: 0.4 + Math.random() * 0.2 }
+    }),
+
+    // 🌈 5. Rainbow pop burst
+    () => confetti({
+        particleCount: 300,
+        spread: 160,
+        scalar: 1.2,
+        colors: ['#ff0', '#f0f', '#0ff', '#0f0', '#f00', '#00f'],
+        origin: { y: 0.4 },
+        startVelocity: 35
+    }),
+
+    // 🚀 6. Upstream rocket burst (from bottom center)
+    () => confetti({
+        particleCount: 220,
+        angle: 90,
+        spread: 50,
+        startVelocity: 60,
+        origin: { y: 1 }
+    }),
+
+    // 💫 7. Center explosion outward
+    () => confetti({
+        particleCount: 300,
+        spread: 240,
+        startVelocity: 50,
+        origin: { x: 0.5, y: 0.5 }
+    }),
+
+    // 🎯 8. Dual blast from sides
+    () => {
+        confetti({
+            particleCount: 150,
+            angle: 60,
+            spread: 80,
+            startVelocity: 40,
+            origin: { x: 0, y: 0.6 }
+        });
+        confetti({
+            particleCount: 150,
+            angle: 120,
+            spread: 80,
+            startVelocity: 40,
+            origin: { x: 1, y: 0.6 }
+        });
+    },
+
+    // 🔮 9. Floaty gravity shower
+    () => confetti({
+        particleCount: 200,
+        spread: 180,
+        gravity: 0.3,
+        scalar: 1.5,
+        origin: { y: 0.6 }
+    }),
+
+    // 🔥 10. Bottom-center precision cannon upward
+    () => confetti({
+        particleCount: 100,
+        angle: 90,
+        spread: 40,
+        startVelocity: 80,
+        origin: { x: 0.5, y: 0.95 }
+    }),
+];
+        const randomEffect = effects[Math.floor(Math.random() * effects.length)];
+        randomEffect();
+    }
+
+    let holdTimer;
+let chaosInterval;
+let isConfettiChaosRunning = false;
+
+const confettiBtn = document.getElementById('confettiTriggerBtn');
+
+
+
+function shootElectricArcAnimated(chaos = false) {
+    const canvas = document.getElementById('electricityCanvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const startX = Math.random() * canvas.width;
+    const startY = Math.random() * canvas.height;
+    const endX = Math.random() * canvas.width;
+    const endY = Math.random() * canvas.height;
+
+    const glowColors = ['#00f0ff', '#9a00ff', '#cc66ff', '#00ff99', '#ffffff'];
+    const glowColor = glowColors[Math.floor(Math.random() * glowColors.length)];
+
+    const segments = chaos ? 14 : 10;       // ✨ Fewer points
+    const maxOffset = chaos ? 60 : 40;
+    const maxFrames = chaos ? 16 : 10;
+    let frame = 0;
+
+    function drawLightningBranch(sx, sy, ex, ey, thickness = 4, depth = 0) {
+        const pointCount = segments - depth * 2; // Fewer points for child branches
+        let points = [{ x: sx, y: sy }];
+        for (let i = 1; i < pointCount; i++) {
+            const t = i / pointCount;
+            const x = sx + (ex - sx) * t + (Math.random() - 0.5) * maxOffset;
+            const y = sy + (ey - sy) * t + (Math.random() - 0.5) * maxOffset;
+            points.push({ x, y });
+
+            // ⚡ Branch every few points with spacing
+            if (chaos && depth < 2 && i % 4 === 0 && Math.random() < 0.6) {
+                const branchEndX = x + (Math.random() - 0.5) * 200;
+                const branchEndY = y + (Math.random() - 0.5) * 200;
+                drawLightningBranch(x, y, branchEndX, branchEndY, thickness * 0.6, depth + 1);
+            }
+        }
+        points.push({ x: ex, y: ey });
+
+        ctx.strokeStyle = glowColor;
+        ctx.lineWidth = thickness;
+        ctx.shadowBlur = 30;
+        ctx.shadowColor = glowColor;
+
+        ctx.beginPath();
+        ctx.moveTo(points[0].x, points[0].y);
+        points.forEach(p => ctx.lineTo(p.x, p.y));
+        ctx.stroke();
+    }
+
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawLightningBranch(startX, startY, endX, endY);
+        frame++;
+        if (frame < maxFrames) {
+            requestAnimationFrame(animate);
+        } else {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+    }
+
+    animate();
+}
+
+
+let fireballParticles = [];
+let fireballRainActive = false;
+
+function startFireballRain() {
+    const canvas = document.getElementById('fireballCanvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    fireballRainActive = true;
+
+    function spawnFireball() {
+        fireballParticles.push({
+            x: Math.random() * canvas.width,
+            y: -20,
+            vx: (Math.random() - 0.5) * 0.5,
+            vy: 2 + Math.random() * 2,
+            radius: 6 + Math.random() * 4,
+            trail: [],
+            maxTrail: 10,
+            color: '#ff6600'
+        });
+    }
+
+    let frameCount = 0;
+
+    function animateFireballs() {
+        if (!fireballRainActive) return;
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Spawn new fireballs periodically
+        if (frameCount % 4 === 0 && fireballParticles.length < 50) {
+            spawnFireball();
+        }
+
+        // Update and draw each fireball
+        for (let i = fireballParticles.length - 1; i >= 0; i--) {
+            const fb = fireballParticles[i];
+            fb.x += fb.vx;
+            fb.y += fb.vy;
+
+            // Trail logic
+            fb.trail.unshift({ x: fb.x, y: fb.y, r: fb.radius });
+            if (fb.trail.length > fb.maxTrail) fb.trail.pop();
+
+            // Draw trail
+            for (let j = 0; j < fb.trail.length; j++) {
+                const t = fb.trail[j];
+                ctx.beginPath();
+                ctx.arc(t.x, t.y, t.r * (1 - j / fb.maxTrail), 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, ${100 + j * 10}, 0, ${0.2 + (1 - j / fb.maxTrail) * 0.5})`;
+                ctx.fill();
+            }
+
+            // Draw core
+            const gradient = ctx.createRadialGradient(fb.x, fb.y, 0, fb.x, fb.y, fb.radius);
+            gradient.addColorStop(0, '#fff');
+            gradient.addColorStop(1, fb.color);
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.arc(fb.x, fb.y, fb.radius, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Remove offscreen fireballs
+            if (fb.y > canvas.height + 30) {
+                fireballParticles.splice(i, 1);
+            }
+        }
+
+        frameCount++;
+        requestAnimationFrame(animateFireballs);
+    }
+
+    animateFireballs();
+}
+
+
+function startConfettiChaos() {
+    if (isConfettiChaosRunning) return;
+
+    isConfettiChaosRunning = true;
+
+    startFireballRain();
+
+    const chaosStart = Date.now();
+
+    chaosInterval = setInterval(() => {
+        const elapsed = Date.now() - chaosStart;
+
+        // 🎉 Confetti burst
+        confetti({
+            particleCount: Math.floor(Math.random() * 200) + 500,
+            spread: Math.floor(Math.random() * 180) + 180,
+            startVelocity: 50 + Math.random() * 50,
+            gravity: 0.3 + Math.random() * 0.4,
+            scalar: 1 + Math.random() * 0.8,
+            ticks: 90 + Math.random() * 30,
+            origin: {
+                x: Math.random() * 0.6 + 0.2,
+                y: Math.random() * 0.5 + 0.1
+            },
+            colors: ['#00f0ff', '#9a00ff', '#cc66ff', '#00ff99', '#ff00f7', '#ffffff'].sort(() => 0.5 - Math.random()).slice(0, 4)
+        });
+
+        // ⚡ Electric arc blast
+        for (let i = 0; i < 2; i++) {
+            shootElectricArcAnimated(true); // true = full chaos mode
+        }
+
+        if (elapsed > 5000) {
+            clearInterval(chaosInterval);
+            stopFireballRain();
+            isConfettiChaosRunning = false;
+
+            tryRewardEasterEgg('confetti_hold_5s');
+        }
+    }, 300);
+}
+
+function stopFireballRain() {
+    fireballRainActive = false;
+
+    // Clear canvas and remove particles
+    fireballParticles = [];
+
+    const canvas = document.getElementById('fireballCanvas');
+    if (canvas) {
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+}
+
+
+function tryRewardEasterEgg(eggKey) {
+    if (!window.csrfToken) {
+        console.error('Missing CSRF token.');
+        return;
+    }
+
+    fetch('/api/easter-eggs/found', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': window.csrfToken
+        },
+        body: JSON.stringify({ egg_key: eggKey })
+    })
+    .then(async res => {
+        const text = await res.text(); // grab raw response body
+
+        try {
+            const json = JSON.parse(text); // attempt to parse as JSON
+            if (res.ok && json.success) {
+                rewardEasterEgg(eggKey); // 🎉 run the animation
+            } else {
+                console.warn('Server responded, but no reward:', json);
+            }
+        } catch (e) {
+            console.error('⚠️ Response was not valid JSON:', text);
+        }
+    })
+    .catch(err => {
+        console.error('🐛 Egg reward fetch failed:', err);
+    });
+}
+
+
+function rewardEasterEgg(foundEggId) {
+    const egg = document.getElementById('easterEggReward');
+    egg.style.transition = 'none';
+    egg.style.transform = 'translate(-50%, -50%) scale(0)';
+    egg.style.opacity = '1';
+    egg.style.display = 'block';
+
+    // Animate to topbar
+    egg.style.animation = 'eggPopAndFly 2s ease forwards';
+
+    // After animation completes
+    setTimeout(() => {
+        egg.style.display = 'none';
+        incrementEggCounterUI();
+        saveEggToDatabase(foundEggId);
+    }, 2000);
+}
+
+function incrementEggCounterUI() {
+    const counter = document.getElementById('eggCounter');
+    const current = parseInt(counter.textContent) || 0;
+    counter.textContent = current + 1;
+}
+
+function saveEggToDatabase(eggKey) {
+    fetch('/api/easter-eggs/found', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': window.csrfToken
+        },
+        body: JSON.stringify({ egg_key: eggKey })
+    });
+}
+
+// Mouse/Touch Hold Detection
+confettiBtn?.addEventListener('mousedown', () => {
+    holdTimer = setTimeout(() => {
+        startConfettiChaos();
+    }, 5000);
+});
+confettiBtn?.addEventListener('mouseup', () => clearTimeout(holdTimer));
+confettiBtn?.addEventListener('mouseleave', () => clearTimeout(holdTimer));
+confettiBtn?.addEventListener('touchstart', () => {
+    holdTimer = setTimeout(() => {
+        startConfettiChaos();
+    }, 5000);
+});
+confettiBtn?.addEventListener('touchend', () => clearTimeout(holdTimer));
+
+    document.getElementById('confettiTriggerBtn')?.addEventListener('click', fireRandomConfetti);
+</script><?php /**PATH /Users/luk/Desktop/WORKSPACE/WBHUB_V1/resources/views/layouts/topbar.blade.php ENDPATH**/ ?>

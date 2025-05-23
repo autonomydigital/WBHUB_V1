@@ -19,4 +19,15 @@ class NotificationController extends Controller
         return view('notifications::alerts', compact('notifications', 'unreadCount'));
     }
 
+    public function dismiss(DatabaseNotification $notification)
+    {
+        if ($notification->notifiable_id !== auth()->id()) {
+            abort(403, 'Unauthorized');
+        }
+    
+        $notification->delete();
+        
+        return response()->json(['message' => 'Notification dismissed.']);
+    }
+
 }

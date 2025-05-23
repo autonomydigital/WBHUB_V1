@@ -34,5 +34,9 @@ class AppServiceProvider extends ServiceProvider
         $view->with('authUser', auth()->user());
     });
 
+    View::share('googleMapsKey', config('services.google.maps_key'));
+
     }
+
+    
 }

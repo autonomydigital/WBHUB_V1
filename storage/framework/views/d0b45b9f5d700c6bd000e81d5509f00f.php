@@ -13,7 +13,7 @@
             aria-expanded="false">
         <i class='bx bx-bell fs-22'></i>
         <?php if($unreadCount > 0): ?>
-            <span class="position-absolute topbar-badge fs-10 translate-middle badge rounded-pill bg-danger">
+            <span class="position-absolute topbar-badge fs-10 translate-middle badge rounded-pill bg-danger" id="topbar-unread-count">
                 <?php echo e($unreadCount); ?>
 
                 <span class="visually-hidden">unread alerts</span>
@@ -63,8 +63,11 @@
                             $from = \App\Models\User::find($data['from_user_id'] ?? null);
                             $fromName = $from ? $from->first_name . ' ' . $from->last_name : 'Someone';
                         ?>
-                        <div class="text-reset notification-item d-block dropdown-item position-relative">
-                            <div class="d-flex align-items-start">
+                        <div class="text-reset notification-item d-block dropdown-item position-relative" data-notification-id="<?php echo e($noti->id); ?>">
+                            <button class="btn btn-sm btn-icon btn-light text-muted position-absolute top-0 end-0 m-1 btn-close-notification" data-id="<?php echo e($noti->id); ?>">
+                                <i class="ri-close-line"></i>
+                            </button>
+                            <div class="d-flex align-items-start pe-4">
                                 <div class="avatar-xs me-3 flex-shrink-0">
                                     <?php if($from && $from->avatar): ?>
                                         <img src="<?php echo e(asset('storage/' . $from->avatar)); ?>" class="rounded-circle avatar-xs" alt="avatar">
@@ -76,21 +79,26 @@
                                 </div>
 
                                 <div class="flex-grow-1">
-                                        <h6 class="mt-0 mb-2 lh-base"><?php echo e($fromName); ?> wants to connect.</h6>
-                                        <p class="mb-0 text-muted fs-11"><i class="mdi mdi-clock-outline"></i> <?php echo e($noti->created_at->diffForHumans()); ?></p>
+                                    <h6 class="mt-0 mb-2 lh-base"><?php echo $data['title'] ?? ($fromName . ' sent you a request'); ?></h6>
+                                    <div class="d-flex justify-content-between align-items-center mt-2">
+                                        <p class="mb-0 text-muted fs-11">
+                                            <i class="mdi mdi-clock-outline"></i> <?php echo e(\Illuminate\Support\Str::replaceLast(' ago', '', $noti->created_at->diffForHumans())); ?>
 
-                                    <?php if(($data['type'] ?? null) === 'connection_request'): ?>
-                                        <div class="mt-2 d-flex gap-2">
-                                            <button class="btn btn-sm btn-soft-success btn-accept"
-                                            data-id="<?php echo e($noti->data['connection_id'] ?? 'MISSING_ID'); ?>">
-                                        Accept
-                                    </button>
-                                            
-                                            <button class="btn btn-sm btn-soft-danger btn-deny" data-id="<?php echo e($noti->data['connection_id'] ?? ''); ?>">
-                                                Deny
-                                            </button>
-                                        </div>
-                                    <?php endif; ?>
+                                        </p>
+                                    
+                                        <?php if(($data['type'] ?? null) === 'connection_request'): ?>
+                                            <div class="d-flex gap-2">
+                                                <button class="btn btn-sm btn-soft-success btn-accept"
+                                                    data-id="<?php echo e($noti->data['connection_id'] ?? 'MISSING_ID'); ?>">
+                                                    Accept
+                                                </button>
+                                                <button class="btn btn-sm btn-soft-danger btn-deny"
+                                                    data-id="<?php echo e($noti->data['connection_id'] ?? ''); ?>">
+                                                    Deny
+                                                </button>
+                                            </div>
+                                        <?php endif; ?>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -130,8 +138,11 @@
                             $from = \App\Models\User::find($data['from_user_id'] ?? null);
                             $fromName = $from ? $from->first_name . ' ' . $from->last_name : 'Someone';
                         ?>
-                        <div class="text-reset notification-item d-block dropdown-item position-relative">
-                            <div class="d-flex align-items-start">
+                        <div class="text-reset notification-item d-block dropdown-item position-relative" data-notification-id="<?php echo e($noti->id); ?>">
+                            <button class="btn btn-sm btn-icon btn-light text-muted position-absolute top-0 end-0 m-1 btn-close-notification" data-id="<?php echo e($noti->id); ?>">
+                                <i class="ri-close-line"></i>
+                            </button>
+                            <div class="d-flex align-items-start pe-4">
                                 <div class="avatar-xs me-3 flex-shrink-0">
                                     <?php if($from && $from->avatar): ?>
                                         <img src="<?php echo e(asset('storage/' . $from->avatar)); ?>" class="rounded-circle avatar-xs" alt="avatar">
@@ -143,16 +154,25 @@
                                 </div>
 
                                 <div class="flex-grow-1">
-                                        <h6 class="mt-0 mb-2 lh-base"><?php echo e($fromName); ?> wants to connect.</h6>
-                                        <p class="mb-0 fs-11 text-muted">
-                                            <i class="mdi mdi-clock-outline"></i> <?php echo e($noti->created_at->diffForHumans()); ?>
+                                    <h6 class="mt-0 mb-2 lh-base"><?php echo $data['title'] ?? ($fromName . ' sent you a request'); ?></h6>
+                                    <div class="d-flex justify-content-between align-items-center mt-2">
+                                        <p class="mb-0 text-muted fs-11">
+                                            <i class="mdi mdi-clock-outline"></i> <?php echo e(\Illuminate\Support\Str::replaceLast(' ago', '', $noti->created_at->diffForHumans())); ?>
 
                                         </p>
                                     
-
-                                    <div class="mt-2 d-flex gap-2">
-                                        <button class="btn btn-sm btn-soft-success btn-accept" data-id="<?php echo e($from->id ?? ''); ?>">Accept</button>
-                                        <button class="btn btn-sm btn-soft-danger btn-deny" data-id="<?php echo e($from->id ?? ''); ?>">Deny</button>
+                                        <?php if(($data['type'] ?? null) === 'connection_request'): ?>
+                                            <div class="d-flex gap-2">
+                                                <button class="btn btn-sm btn-soft-success btn-accept"
+                                                    data-id="<?php echo e($noti->data['connection_id'] ?? 'MISSING_ID'); ?>">
+                                                    Accept
+                                                </button>
+                                                <button class="btn btn-sm btn-soft-danger btn-deny"
+                                                    data-id="<?php echo e($noti->data['connection_id'] ?? ''); ?>">
+                                                    Deny
+                                                </button>
+                                            </div>
+                                        <?php endif; ?>
                                     </div>
                                 </div>
                             </div>
@@ -175,4 +195,5 @@
             </div>
         </div>
     </div>
-</div><?php /**PATH /Users/luk/Desktop/WORKSPACE/WBHUB_V1/Modules/Notifications/Resources/views/partials/topbar.blade.php ENDPATH**/ ?>
+</div>
+<?php /**PATH /Users/luk/Desktop/WORKSPACE/WBHUB_V1/Modules/Notifications/Resources/views/partials/topbar.blade.php ENDPATH**/ ?>

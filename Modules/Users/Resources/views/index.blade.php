@@ -6,12 +6,24 @@
 <div class="row mb-4 align-items-center g-2">
     <div class="col-md-auto">
         <div class="btn-group" role="group" aria-label="User Filters">
-            <button type="button" class="btn btn-outline-primary" id="filterFollowingBtn">
+            <button type="button" class="btn btn-outline-success" id="filterFollowingBtn">
                 <i class="ri-eye-line me-1"></i> Following
             </button>
-            <button type="button" class="btn btn-outline-success" id="filterConnectedBtn">
-                <i class="ri-link-line me-1"></i> Connected
+            <button type="button" class="btn btn-outline-secondary" id="filterConnectedBtn">
+                <i class="ri-team-line me-1"></i> Connections
             </button>
+            @php
+            $requestCount = auth()->user()->receivedConnections()->where('status', 'pending')->count();
+        @endphp
+        
+        <button type="button" class="btn btn-outline-primary position-relative" id="filterRequestsBtn">
+            <i class="ri-user-add-line me-1"></i> Requests
+            @if($requestCount > 0)
+                <span id="requestCountBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                    {{ $requestCount }}
+                </span>
+            @endif
+        </button>
         </div>
     </div>
 
@@ -67,21 +79,7 @@
     </div>
 </div>
 
-<div class="modal fade" id="connectionRequestModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content shadow">
-            <div class="modal-header">
-                <h5 class="modal-title">Respond to Request</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body text-center">
-                <p id="connRequestMsg" class="fs-6 mb-4">Someone wants to connect with you.</p>
-                <button class="btn btn-success me-2" id="modalAcceptBtn">Accept</button>
-                <button class="btn btn-outline-danger" id="modalDenyBtn">Deny</button>
-            </div>
-        </div>
-    </div>
-</div>
+
 @endsection
 
 @section('script')

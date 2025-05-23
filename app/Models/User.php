@@ -178,5 +178,17 @@ public function hasSentConnectionRequestTo($user)
         ->exists();
 }
 
+public function getFullNameAttribute()
+{
+    return "{$this->first_name} {$this->last_name}";
+}
+
+public function businesses()
+{
+    return $this->belongsToMany(\Modules\Businesses\Models\Business::class)
+                ->withPivot('role')
+                ->withTimestamps();
+}
+
 
 }

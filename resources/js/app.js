@@ -7,8 +7,8 @@ Contact: Themesbrand@gmail.com
 File: Main Js File
 */
 
-import AOS from 'aos';
-import 'aos/dist/aos.css';
+// import AOS from 'aos';
+// import 'aos/dist/aos.css';
 
 
 (function () {
@@ -1039,17 +1039,7 @@ import 'aos/dist/aos.css';
 						if (elem.querySelector(".view-all")) {
 							elem.querySelector(".view-all").style.display = "none";
 						}
-						var emptyNotificationElem = elem.querySelector(".empty-notification-elem")
-						if (!emptyNotificationElem) {
-							elem.innerHTML += '<div class="empty-notification-elem">\
-							<div class="w-25 w-sm-50 pt-3 mx-auto">\
-								<img src="build/images/svg/bell.svg" class="img-fluid" alt="user-pic">\
-							</div>\
-							<div class="text-center pb-5 mt-2">\
-								<h6 class="fs-18 fw-semibold lh-base">Hey! You have no any notifications </h6>\
-							</div>\
-						</div>'
-						}
+				
 					}
 				});
 			}
@@ -2056,3 +2046,4 @@ if (mybutton) {
 		document.documentElement.scrollTop = 0;
 	}
 }
+

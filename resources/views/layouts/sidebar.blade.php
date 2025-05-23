@@ -469,10 +469,10 @@
                             
                            
                             <li class="nav-item">
-                                <a href="pages-profile" class="nav-link"><i class="lar la-user-edit"></i><span>@lang('translation.profile')</a></span>
+                                <a href="/profile" class="nav-link"><i class="lar la-user-edit"></i><span>@lang('translation.profile')</a></span>
                             </li>
                             <li class="nav-item">
-                                <a href="pages-team" class="nav-link"><i class="lar la-users"></i><span>People</span></a>
+                                <a href="/users" class="nav-link"><i class="lar la-users"></i><span>People</span></a>
                             </li>
                            
                             <li class="nav-item">

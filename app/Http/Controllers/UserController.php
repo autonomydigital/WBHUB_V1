@@ -36,7 +36,7 @@ class UserController extends Controller
 
     public function showProfile($id)
 {
-    $user = User::with('socials')->findOrFail($id);
+    $user = User::with(['followers', 'following', 'socials'])->findOrFail($id);
 
     // Optional profile completion logic:
     $fields = ['first_name', 'last_name', 'email', 'phone', 'bio', 'avatar'];

@@ -108,6 +108,16 @@ function removeToast(button) {
 
 <div id="custom-toast-wrapper" class="toast-stack position-fixed bottom-0 end-0 p-3" style="z-index: 1080;"></div>
 
+<!-- ⚡ Electricity canvas (zaps) -->
+<canvas id="electricityCanvas" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 9999;"></canvas>
+
+<!-- 🔥 Fireball rain canvas -->
+<canvas id="fireballCanvas" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 9998;"></canvas>
+
+<div id="easterEggReward" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); z-index: 10000; pointer-events: none;">
+    <img src="/images/egg-gold.png" alt="Easter Egg" style="width: 80px; animation: spin 2s linear infinite;">
+</div>
+
 <?php echo $__env->yieldContent('script'); ?>
 </body>
 
