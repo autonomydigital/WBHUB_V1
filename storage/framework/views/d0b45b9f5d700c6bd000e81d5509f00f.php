@@ -1,6 +1,6 @@
 <?php
     $user = Auth::user();
-    $unreadNotifications = $user->unreadNotifications;
+    $unreadNotifications = $user?->unreadNotifications ?? collect();
     $unreadCount = $unreadNotifications->count();
 ?>
 

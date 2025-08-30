@@ -474,6 +474,17 @@
                             <li class="nav-item">
                                 <a href="/users" class="nav-link"><i class="lar la-users"></i><span>People</span></a>
                             </li>
+
+                            <li class="nav-item">
+                                <a href="/businesses" class="nav-link"><i class="lar la-building"></i><span>Businesses</span></a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a href="/website-content/1/pages/home/edit" class="nav-link">
+                                    <i class="lar la-globe"></i>
+                                    <span>Website Content</span>
+                                </a>
+                            </li>
                            
                             <li class="nav-item">
                                 <a href="pages-faqs" class="nav-link"><i class="lar la-question-circle"></i><span><?php echo app('translator')->get('translation.faqs'); ?></span></a>

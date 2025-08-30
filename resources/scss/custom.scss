@@ -282,3 +282,82 @@ File: Custom Css File
     80%  { transform: translate(0, -200px) scale(0.5); opacity: 1; }
     100% { transform: translate(calc(100vw - 80px), -50vh) scale(0); opacity: 0; }
 }
+
+.pulse-dot {
+    animation: pulse 1.2s infinite ease-in-out;
+}
+
+@keyframes pulse {
+    0% { transform: scale(0.9); opacity: 0.5; }
+    50% { transform: scale(1.2); opacity: 1; }
+    100% { transform: scale(0.9); opacity: 0.5; }
+}
+
+.business-rotator-spit {
+    position: relative;
+    height: 60px;
+    overflow: hidden;
+    transform-style: preserve-3d;
+    perspective: 800px;
+}
+
+.spit-slide-x {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.7s ease-in-out, opacity 0.5s ease-in-out;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    transform-origin: center center;
+}
+
+.transition-rotate-x {
+    will-change: transform, opacity;
+}
+
+.chat-toggle-icon.opacity-50 {
+    opacity: 0.5;
+    transition: opacity 0.2s;
+}
+
+.chat-toggle-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    background-color: #000;
+    object-fit: cover;
+    cursor: pointer;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.chat-toggle-icon:hover {
+    transform: scale(1.05);
+    border-color: #0ea5e9;
+}
+
+.is-invalid {
+    border-color: #dc3545;
+    background-color: #f8d7da;
+}
+
+
+/* Force nav link labels to not wrap */
+.navbar-nav .nav-link span {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+/* Hide text until full hover */
+[data-sidebar-size="sm-hover"] .app-menu:not(:hover) .nav-link span {
+    display: none !important;
+}
+
+/* Prevent awkward animation stages */
+.app-menu.navbar-menu {
+    transition: width 0.2s ease !important;
+}

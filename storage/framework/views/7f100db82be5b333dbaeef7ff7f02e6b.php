@@ -1,0 +1,1 @@
+<?php /**PATH /Users/luk/Desktop/WORKSPACE/WBHUB_V1/Modules/Businesses/Resources/views/partials/_business_cards_lazy.blade.php ENDPATH**/ ?>

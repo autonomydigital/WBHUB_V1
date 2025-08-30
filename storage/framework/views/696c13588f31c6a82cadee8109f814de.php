@@ -1,0 +1,15 @@
+          <!--map-modal -->
+          <div class="map-modal-wrap">
+            <div class="map-modal-wrap-overlay"></div>
+            <div class="map-modal-item">
+                <div class="map-modal-container fl-wrap">
+                    <h3> <span>Listing Title </span></h3>
+                    <div class="map-modal-close"><i class="fa-regular fa-xmark"></i></div>
+                    <div class="map-modal fl-wrap">
+                        <div id="singleMap" data-latitude="40.7" data-longitude="-73.1"></div>
+                        <div class="scrollContorl"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--map-modal end --> 			<?php /**PATH /Users/luk/Desktop/WORKSPACE/WBHUB_V1/Modules/WebsiteContent/Resources/views/websites/plp/partials/map-modal.blade.php ENDPATH**/ ?>

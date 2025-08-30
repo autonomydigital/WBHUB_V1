@@ -1,0 +1,1 @@
+<h1 style="padding: 3rem; font-size: 2rem;">✅ Properties index page loaded.</h1><?php /**PATH /Users/luk/Desktop/WORKSPACE/WBHUB_V1/Modules/Properties/Resources/views/index.blade.php ENDPATH**/ ?>

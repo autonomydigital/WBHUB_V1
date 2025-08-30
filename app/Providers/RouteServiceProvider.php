@@ -23,16 +23,26 @@ class RouteServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->configureRateLimiting();
-
+    
         $this->routes(function () {
+            // API Routes
             Route::prefix('api')
                 ->middleware('api')
                 ->group(base_path('routes/api.php'));
+                
+            // 🟢 Subdomain-based websites
+            Route::middleware(['web', 'validate.subdomain'])
+                ->domain('{business}.wbhub.test')
+                ->group(base_path('Modules/WebsiteContent/Routes/website-frontend.php'));
 
+            // 🔶 Custom domain-based websites
+            Route::middleware(['web', 'validate.customdomain'])
+                ->group(base_path('Modules/WebsiteContent/Routes/website-frontend.php'));
+    
+            // Admin + fallback
             Route::middleware('web')
                 ->group(base_path('routes/web.php'));
-
-            // 👇 Load fallback route LAST so it doesn't override anything else
+    
             Route::middleware('web')
                 ->group(base_path('routes/fallback.php'));
         });

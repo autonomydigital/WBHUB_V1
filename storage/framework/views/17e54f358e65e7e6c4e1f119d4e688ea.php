@@ -1,0 +1,1 @@
+<?php echo e($users->links('vendor.pagination.bootstrap-5')); ?><?php /**PATH /Users/luk/Desktop/WORKSPACE/WBHUB_V1/Modules/Users/Resources/views/partials/_pagination.blade.php ENDPATH**/ ?>

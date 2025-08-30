@@ -1,0 +1,1 @@
+<h1 style="padding: 3rem; font-size: 2rem;">✅ Properties index page loaded.</h1>

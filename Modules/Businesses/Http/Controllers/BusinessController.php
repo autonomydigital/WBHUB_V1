@@ -6,7 +6,10 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Modules\Businesses\Models\Business;
 use Illuminate\Support\Facades\Storage;
-use Intervention\Image\ImageManager;
+use Laravolt\Avatar\Avatar;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\File;
+
 
 class BusinessController extends Controller
 {
@@ -41,25 +44,49 @@ class BusinessController extends Controller
         ]);
 
         // Assign a random default cover
-        $defaultCover = 'default-covers/cover' . rand(1, 32) . '.jpg';
+        $coverFile = public_path('default-covers/cover' . rand(1, 32) . '.jpg');
         $coverPath = 'covers/' . uniqid() . '.jpg';
-        Storage::copy('public/' . $defaultCover, 'public/' . $coverPath);
-        $business->cover_photo = $coverPath;
+        
+        if (File::exists($coverFile)) {
+            Storage::disk('public')->put($coverPath, File::get($coverFile));
+            $business->cover_photo = $coverPath;
+        }
 
-        $initial = strtoupper(substr($request->name, 0, 1));
-        $filename = 'logos/' . uniqid() . '.png';
+        $initial = strtoupper(substr($request->name, 0, 1)); // 2 letters like "WB"
+
+        // Clone the current config and override shape + size
+        $bgColors = [
+            '#fca5a5', // soft red
+            '#fdba74', // light orange
+            '#fcd34d', // soft gold
+            '#86efac', // mint green
+            '#6ee7b7', // teal
+            '#93c5fd', // pastel blue
+            '#a5b4fc', // lavender
+            '#c084fc', // soft purple
+            '#f9a8d4', // rose pink
+            '#f472b6', // deeper pink
+        ];
         
-        $image = (new ImageManager())->canvas(128, 128, '#f2f2f2')
-            ->text($initial, 64, 64, function ($font) {
-                $font->file(public_path('fonts/Roboto-Bold.ttf'));
-                $font->size(64);
-                $font->color('#ffffff');
-                $font->align('center');
-                $font->valign('center');
-            });
+        $randomBg = $bgColors[array_rand($bgColors)];
         
-        Storage::put("public/{$filename}", (string) $image->encode());
-        $business->logo = $filename;
+        $customConfig = Config::get('avatar');
+        $customConfig['width'] = 240;
+        $customConfig['height'] = 100;
+        $customConfig['shape'] = 'square';
+        $customConfig['font_size'] = 48;
+        $customConfig['backgrounds'] = [$randomBg];  // ← randomized here
+        $customConfig['foregrounds'] = ['#ffffff'];
+        
+        // Inject config manually
+        $avatar = new Avatar($customConfig);
+        $avatarBase64 = $avatar->create($initial)->toBase64();
+        
+        $logoPath = 'logos/' . uniqid() . '.png';
+        $avatarBinary = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $avatarBase64));
+        Storage::disk('public')->put($logoPath, $avatarBinary);
+        
+        $business->logo = $logoPath;
 
         $business->save();
 

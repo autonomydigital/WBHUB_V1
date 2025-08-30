@@ -14,6 +14,8 @@ class Business extends Model
         'description',
         'logo',
         'cover_photo',
+        'subdomain',
+        'custom_domain',
         'street',
         'suburb',
         'state',

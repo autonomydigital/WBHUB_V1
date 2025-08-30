@@ -15,6 +15,13 @@
 <?php $__env->startSection('body'); ?>
     <?php echo $__env->make('layouts.body', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
 <?php echo $__env->yieldSection(); ?>
+
+<?php
+    Log::info('🔍 Layout hit', [
+        'user' => auth()->id(),
+        'has_business' => auth()->user()?->businesses->count() ?? null
+    ]);
+?>
     <!-- Begin page -->
     <div id="layout-wrapper">
         <?php echo $__env->make('layouts.topbar', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
@@ -118,7 +125,143 @@ function removeToast(button) {
     <img src="/images/egg-gold.png" alt="Easter Egg" style="width: 80px; animation: spin 2s linear infinite;">
 </div>
 
-<?php echo $__env->yieldContent('script'); ?>
+
+<div id="chatPopupDock" class="position-fixed bottom-0 end-0 m-4" style="z-index: 1060;"></div>
+
+
+<div id="chatToggleStack"
+     class="position-fixed bottom-0 end-0 d-flex flex-column-reverse align-items-center gap-2 mb-4 me-2"
+     style="z-index: 1061; width: 60px;">
+</div>
+
+<?php if (isset($component)) { $__componentOriginal895c0467a79d3a0630854af843f80064 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal895c0467a79d3a0630854af843f80064 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.chat-popup','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('chat-popup'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal895c0467a79d3a0630854af843f80064)): ?>
+<?php $attributes = $__attributesOriginal895c0467a79d3a0630854af843f80064; ?>
+<?php unset($__attributesOriginal895c0467a79d3a0630854af843f80064); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal895c0467a79d3a0630854af843f80064)): ?>
+<?php $component = $__componentOriginal895c0467a79d3a0630854af843f80064; ?>
+<?php unset($__componentOriginal895c0467a79d3a0630854af843f80064); ?>
+<?php endif; ?>
+
+<script>
+const chatState = {};
+let lastActiveChatId = null;
+
+function openChat(business) {
+    const chatId = `chat-${business.id}`;
+
+    // Create chat window if it doesn't exist
+    if (!chatState[chatId]) {
+        const chatBox = document.createElement('div');
+        chatBox.className = 'card shadow position-fixed bottom-0';
+chatBox.style.right = '80px';
+chatBox.style.marginBottom = '1.5rem';
+chatBox.style.width = '320px';
+chatBox.style.zIndex = 1060;
+chatBox.style.borderRadius = '12px';
+chatBox.id = chatId;
+
+chatBox.innerHTML = `
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center gap-2">
+            <img src="${business.logo}" style="width: 32px; height: 32px; object-fit: contain; background: #fff; border-radius: 6px;">
+            <strong>${business.name}</strong>
+        </div>
+        <button class="btn-close btn-close-white btn-sm" onclick="closeChat('${chatId}')"></button>
+    </div>
+    <div class="card-body small p-3 bg-white text-dark" style="height: 200px; overflow-y: auto;">
+        <div class="text-muted small">Chat with ${business.name}</div>
+    </div>
+    <div class="card-footer p-2 d-flex bg-light">
+        <input type="text" class="form-control form-control-sm me-2" placeholder="Message...">
+        <button class="btn btn-sm btn-primary">Send</button>
+    </div>
+`;
+
+        document.getElementById('chatPopupDock').appendChild(chatBox);
+
+        const icon = document.createElement('img');
+        icon.src = business.logo;
+        icon.className = 'rounded-circle shadow chat-toggle-icon';
+        icon.style.width = '42px';
+        icon.style.height = '42px';
+        icon.style.cursor = 'pointer';
+        icon.dataset.chatId = chatId;
+        icon.onclick = () => showOnlyChat(chatId);
+        icon.id = `toggle-${chatId}`;
+
+        document.getElementById('chatToggleStack').appendChild(icon);
+
+        chatState[chatId] = { visible: true };
+
+        // ✅ Force all other chats to hide
+        for (const id in chatState) {
+            if (id !== chatId) {
+                const otherBox = document.getElementById(id);
+                const otherIcon = document.getElementById(`toggle-${id}`);
+                if (otherBox) otherBox.style.display = 'none';
+                if (otherIcon) otherIcon.classList.add('opacity-50');
+                chatState[id].visible = false;
+            }
+        }
+}
+}
+
+function showOnlyChat(chatId) {
+    const box = document.getElementById(chatId);
+
+    // Toggle off if already visible
+    if (chatState[chatId]?.visible) {
+        box.style.display = 'none';
+        document.getElementById(`toggle-${chatId}`).classList.add('opacity-50');
+        chatState[chatId].visible = false;
+        return;
+    }
+
+    // Hide all other chats
+    for (const id in chatState) {
+        const otherBox = document.getElementById(id);
+        const otherIcon = document.getElementById(`toggle-${id}`);
+        if (otherBox) otherBox.style.display = 'none';
+        if (otherIcon) otherIcon.classList.add('opacity-50');
+        chatState[id].visible = false;
+    }
+
+    // Show the selected chat
+    box.style.display = 'block';
+    document.getElementById(`toggle-${chatId}`).classList.remove('opacity-50');
+    chatState[chatId].visible = true;
+}
+
+function closeChat(chatId) {
+    const box = document.getElementById(chatId);
+    const icon = document.getElementById(`toggle-${chatId}`);
+
+    if (box) box.remove();
+    if (icon) icon.remove();
+
+    delete chatState[chatId];
+
+    // ✅ After closing, open the next available chat if one exists
+    const openIds = Object.keys(chatState);
+    if (openIds.length > 0) {
+        showOnlyChat(openIds[0]); // just pick the first tracked chat
+    }
+}
+</script>
+
 </body>
 
 </html>

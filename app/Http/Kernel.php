@@ -69,6 +69,9 @@ class Kernel extends HttpKernel
         'role'       => \Spatie\Permission\Middleware\RoleMiddleware::class,
         'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
         'godmode' => \App\Http\Middleware\GodModeMiddleware::class,
+        'validate.subdomain' => \App\Http\Middleware\ValidateSubdomain::class,
+        'resolve.business.subdomain' => \App\Http\Middleware\ResolveBusinessDomain::class,
+        'validate.customdomain' => \App\Http\Middleware\ValidateCustomDomain::class,
         
     ];
 }
